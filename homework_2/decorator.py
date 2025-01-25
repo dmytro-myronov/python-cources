@@ -3,7 +3,7 @@ import types
 
 def log_methods(func):
     def wrapper(self, *args, **kwargs):
-        print(f"Метод {func.__name__} вызывается.")
+        print(f"method {func.__name__} call.")
         return func(self, *args, **kwargs)
 
     return wrapper
