@@ -23,8 +23,6 @@ class PriceWithProperty:
         self._price = value
 
 
-
-
 price_el = PriceWithProperty(10)
 p = price_el.price
 price_el.price = 100

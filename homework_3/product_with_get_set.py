@@ -1,3 +1,4 @@
+
 class PriceWithGetSet:
     """
     Represents an object that encapsulates a price value with getter and setter

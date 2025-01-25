@@ -5,6 +5,7 @@ class PriceCurrencyDescriptor:
         if currency not in ('USD', 'EUR'):
             raise ValueError('Currency must be USD or EUR')
         instance.__dict__['currency'] = currency
+
 class PriceDescriptor:
     """
     Descriptor class for controlling the `price` attribute. Provides a mechanism to validate and manage
@@ -76,8 +77,6 @@ class PriceCurrencyConverter:
                 return price.price * value_currency
             except KeyError as e:
                 print("please provide valid currency")
-
-
 
 
 converter = PriceCurrencyConverter()
