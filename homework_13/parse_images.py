@@ -59,9 +59,6 @@ async def download_page(url: str):
     return req.text
 
 
-# async def main(url: str):
-#     html_data = await download_page(url)
-#     print("images downloaded")
 
 async def fetch_all(urls: list):
     tasks = [download_image(url) for url in urls]
