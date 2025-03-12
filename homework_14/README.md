@@ -19,7 +19,7 @@ pip install requests beautifulsoup4
 Run the script with:
 
 ```bash
-python script.py
+python parse_news.py
 ```
 
 You will be prompted to enter a number of hours to filter news articles from recent history. If left empty, all available articles will be retrieved.
