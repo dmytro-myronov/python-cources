@@ -1,5 +1,10 @@
 import csv
+import os
+import logging
+import time
+
 import requests
+from tqdm import tqdm
 from bs4 import BeautifulSoup, Tag
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
@@ -18,22 +23,29 @@ def get_element(tag: Tag, search_tag_name: str, attrs: Optional[dict] = None) ->
     try:
         return tag.find(search_tag_name, attrs or {})
     except Exception as e:
-        print(f"Error finding element {search_tag_name}: {e}")
+        logging.error(f"Error finding element {search_tag_name}: {e}")
         return None
 
 
-def add_new_film_data(news: List[Tuple[str, str, str, str]]) -> None:
+def add_news_data_to_file(news: List[Tuple[str, str, str, str]]) -> None:
     """
-    Appends new film data to a CSV file.
+    Appends new news data to a CSV file.
 
     :param news: A list of tuples containing news data (title, full URL, date published, image link).
     """
     if news:
-        with open('news.csv', mode='a', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(['article_title', 'article_full_url', 'article_date_public', 'image_link'])
-            writer.writerows(news)
-            print("Film data added successfully.")
+        if not os.path.exists('news.csv') or os.stat('news.csv').st_size == 0:
+
+            with open('news.csv', mode='w', newline='', encoding='utf-8') as file:
+
+                writer = csv.writer(file)
+                writer.writerow(['article_title', 'article_full_url', 'article_date_public', 'image_link'])
+                writer.writerows(news)
+                logging.info(f"Wrote {len(news)} rows to news.csv")
+        else:
+            with open('news.csv', "a", encoding="utf-8") as file:
+                writer = csv.writer(file)
+                writer.writerows(news)
 
 
 def parse_news(url: str, date_from: Optional[datetime] = None) -> List[Tuple[str, str, str, str]]:
@@ -53,10 +65,9 @@ def parse_news(url: str, date_from: Optional[datetime] = None) -> List[Tuple[str
         parsed_url = urlparse(url)
         base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
 
-        for i, article in enumerate(news_articles):
-            print(f"Processing article {i}")
-            if not isinstance(article, Tag):
-                continue
+        for i, article in tqdm(list(enumerate(news_articles)), total=len(news_articles), desc="Processing", ncols=100):
+            time.sleep(0.1)
+            logging.info(f"Parsing article {i+1} of {len(news_articles)}")
 
             # Extract publication date
             article_date_element = get_element(article, 'time', {'class': 'hvbAAd'})
@@ -66,9 +77,11 @@ def parse_news(url: str, date_from: Optional[datetime] = None) -> List[Tuple[str
                 if date_from and article_date_public:
                     published_date = datetime.strptime(article_date_public, "%Y-%m-%dT%H:%M:%SZ")
                     if published_date < date_from:
+                        logging.info(f"skip article {i} cause date")
+
                         continue
             except ValueError:
-                print(f"Failed to parse date for article {i}")
+                logging.error(f"Failed to parse date for article {i}")
                 continue
 
             # Extract title, link, and image
@@ -76,27 +89,39 @@ def parse_news(url: str, date_from: Optional[datetime] = None) -> List[Tuple[str
             article_title = title_element.text.strip() if title_element else f"Default_{i}"
 
             link_element = get_element(article, 'a', {'class': 'WwrzSb'})
-            article_full_url = f"{base_url}{link_element.attrs['href']}" if link_element else ""
-
+            image_link = ""
+            article_full_url = ""
+            if link_element:
+                p_url_news = urlparse(link_element.attrs['href'])
+                if p_url_news.hostname is None:
+                    article_full_url = f"{base_url}{link_element.attrs['href']}" if link_element else ""
+                else:
+                    article_full_url = f"{p_url_news.scheme}://{p_url_news.netloc}{p_url_news[2]}"
             image_element = get_element(article, 'img')
-            image_link = f"{base_url}{image_element['src']}" if image_element else f"None_{i}"
+            if image_element:
+                 parse_image_url = urlparse(image_element.attrs['src'])
+                 if parse_image_url.hostname is None:
+                     image_link = f"{base_url}{image_element.attrs['src']}" if image_element else ""
+                 else:
+                     image_link = f"{parse_image_url.scheme}://{parse_image_url.netloc}{parse_image_url[2]}"
 
             news_data.append((article_title, article_full_url, article_date_public, image_link))
-
+        logging.info("Successfully parsed news articles.")
     else:
-        print(f"Error fetching news page, status code: {response.status_code}")
+        logging.error(f"Failed to parse news articles. status code error .{response.status_code}")
 
     return news_data
 
 
 if __name__ == "__main__":
+    logging.basicConfig(filename="app.log", level=logging.DEBUG)
     main_url = "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US%3Aen"
     try:
         hours_input = input("Show the news for the last X hours (provide a number or leave empty): ")
-        past_time = datetime.now() - timedelta(hours=int(hours_input)) if hours_input else None
+        past_time = datetime.now() - timedelta(hours=int(hours_input))
     except ValueError:
         past_time = None
-        print("Invalid input. Please enter an integer value for hours.")
 
     news_list = parse_news(main_url, past_time)
-    add_new_film_data(news_list)
+    add_news_data_to_file(news_list)
+    print(f"Successfully parsed {len(news_list)} news.")
