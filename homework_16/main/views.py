@@ -79,7 +79,7 @@ class ServiceView(TemplateView):
     def get_context_data(self, **kwargs: object) -> dict:
         """
         Provides the context data for the services template, including a list of services
-        and applying any requested filter.
+        and applying any requested filter..
 
         Args:
             kwargs: Additional arguments for the context.
