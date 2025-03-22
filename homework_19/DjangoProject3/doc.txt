@@ -1,0 +1,6 @@
+1)Не забывай в конце слеш в файле проекте urls(не приложения)
+2)админку дважды подключать не нужно а только в проекте
+3)нужно подлкючить django_filters/drf_yasg in INSTALLED_APP
+4)фильтрации работает через этот атрибут field_name="author"
+author = django_filters.CharFilter(field_name="author", lookup_expr="icontains")
+5)тесты - при них создается отдельная база. поэтому нужно использовать self.client не получиться слать зарпосы через request
