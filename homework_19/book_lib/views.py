@@ -8,15 +8,22 @@ from book_lib.filters import BookFilter
 from book_lib.models import Book
 from book_lib.serializer import BookSerializer, UserCreateSerializer
 from django.contrib.auth.models import User
+from rest_framework.request import Request
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 10
+    """
+    Custom pagination class to limit the number of results per page.
+    """
+    page_size: int = 10
+    page_size_query_param: str = 'page_size'
+    max_page_size: int = 10
 
 
 class BookViewSet(ModelViewSet):
+    """
+    API endpoint that allows books to be viewed, filtered, and deleted.
+    """
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [DjangoFilterBackend]
@@ -25,12 +32,17 @@ class BookViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     ordering = ['publication_year']
 
-    def destroy(self, request, *args, **kwargs) -> Response:
+    def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        """
+        Delete a book instance.
+        """
         return super().destroy(request, *args, **kwargs)
 
 
-
 class UserCreateView(generics.CreateAPIView):
+    """
+    API endpoint that allows new users to be created.
+    """
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
     permission_classes = [AllowAny]

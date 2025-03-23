@@ -11,7 +11,7 @@ class Book(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['publication_year', 'title']
+        ordering: list = ['publication_year', 'title']
 
     def __str__(self):
         return self.title
