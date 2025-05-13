@@ -1,0 +1,9 @@
+{% extends 'main/base.html' %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+    <h1>Contact</h1>
+    <p>Phone: +380 44 123 45 67</p>
+    <p>Email: info@company.com</p>
+    <p>YEAR support: {{ has_support|yesno:"Yes,No" }}</p>
+    <p>FREE consultation: {{ free_consultation|yesno:"Yes,No" }}</p>
+{% endblock %}
