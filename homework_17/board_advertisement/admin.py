@@ -9,4 +9,4 @@ class AdAdmin(admin.ModelAdmin):
 
 admin.site.register(Category)
 admin.site.register(Comment)
-# admin.site.register(UserProfile)
+
