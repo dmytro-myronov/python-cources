@@ -1,0 +1,48 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app #hack to overload container all the time without restart/rebuild container
+    command: ["bash", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+
+
+    env_file:
+      - .env
+    depends_on:
+      - db
+    healthcheck:
+      test: ping 0.0.0.0 -p 8000 -c 1
+      interval: 60s
+      timeout: 10s
+      retries: 1
+
+
+  db:
+    image: postgres:17.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - pg-volume:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4.2
+    ports:
+      - "6380:6379"
+
+  celery:
+    build: .
+    command: celery -A carsharing worker --loglevel=info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+    env_file:
+      - .env
+volumes:
+    pg-volume:
