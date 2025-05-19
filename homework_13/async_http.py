@@ -1,8 +1,15 @@
 import asyncio
+import logging
 import aiohttp
 from bs4 import BeautifulSoup
 from typing import List, Union, Optional
 from aiohttp import ClientSession
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 async def download_page(session: ClientSession, url: str) -> str:
@@ -30,12 +37,12 @@ async def download_page(session: ClientSession, url: str) -> str:
         try:
             title = soup.title.string.strip() if soup.title and soup.title.string else "No Title"
         except Exception as e:
-            print(f"Error parsing title for {url}: {e}")
+            logger.error(f"Error parsing title for {url}: {e}", exc_info=True)
             title = "Can't parse title"
 
         if doctype:
-            print(doctype)
-        print(title)
+            logger.info(f"Doctype for {url}: {doctype}")
+        logger.info(f"Title for {url}: {title}")
 
         return f"{doctype or 'No DOCTYPE'} | {title}"
 
@@ -68,7 +75,8 @@ async def main() -> None:
             "https://go2.utorr.cc/"
         ]
         results = await fetch_all(session, urls)
-        print(results)
+        logger.info(f"Results: {results}")
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

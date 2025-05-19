@@ -1,17 +1,35 @@
 import asyncio
+import logging
 
-async def slow_task():
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+async def slow_task() -> None:
+    """
+    Асинхронная задача, которая спит 14 секунд и выводит сообщение.
+    """
     await asyncio.sleep(14)
-    print("Hello world after slow_task")
+    logger.info("Hello world after slow_task")
 
 
-async def main():
+async def main() -> None:
+    """
+    Запускает slow_task с таймаутом 5 секунд.
+
+    Если задача не успевает выполниться за 5 секунд,
+    ловит исключение asyncio.TimeoutError и выводит сообщение.
+    """
     try:
         await asyncio.wait_for(slow_task(), timeout=5)
-        print("success")
-    except TimeoutError as e:
-        print("timed out error")
-        print(e)
+        logger.info("success")
+    except asyncio.TimeoutError as e:
+        logger.error("timed out error")
+        logger.debug(e, exc_info=True)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
