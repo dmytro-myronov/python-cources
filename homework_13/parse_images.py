@@ -1,80 +1,58 @@
 import asyncio
 from bs4 import BeautifulSoup
-import requests
+import aiohttp
+import aiofiles
 from bs4 import Tag
+from urllib.parse import urljoin
+import os
+
+async def prepare_images_urls(session, url):
+    async with session.get(url) as resp:
+        html = await resp.text()
+        soup = BeautifulSoup(html, 'html.parser')
+        images = soup.find_all('img')
+
+        full_images_urls = []
+        for i, image_tag in enumerate(images):
+            print(f"prepare image {i}")
+            if isinstance(image_tag, Tag):
+                image_name = image_tag.get('alt') or f"Default_{i}.jpg"
+                image_url = image_tag.get('src')
+                full_image_url = urljoin(url, image_url)
+                full_images_urls.append((image_name, full_image_url))
+        return full_images_urls
 
 
-
-async def prepare_images_urls(url):
-    req = requests.get(url)
-    html = req.content
-    soup = BeautifulSoup(html, 'html.parser')
-    images = soup.find_all('img')
-    i = 0
-    full_images_urls = []
-    for image_tag in images:
-        print(f"prepare image {i}")
-        if isinstance(image_tag, Tag):
-            image_name = image_tag.get('alt') if image_tag.get('alt') else f"Default_{i}"
-            image_url = image_tag.get('src')
-            full_images_urls.append((image_name,url + image_url))
-        i += 1
-
-    return full_images_urls
-
-
-
-async def download_image(image_tuple):
+async def download_image(session, image_tuple):
     image_name, image_url = image_tuple
     print(f"download image {image_name}")
-    with open('images/' + image_name, 'wb') as file:
-        response = requests.get(image_url, stream=True)
-        if response.status_code == 200:
-            for chunk in response.iter_content(1024):
-                file.write(chunk)
+
+    try:
+        async with session.get(image_url) as resp:
+            if resp.status == 200:
+                async with aiofiles.open(f'images/{image_name}', 'wb') as f:
+                    while True:
+                        chunk = await resp.content.read(1024)
+                        if not chunk:
+                            break
+                        await f.write(chunk)
+    except Exception as e:
+        print(f"Error downloading {image_name}: {e}")
 
 
-
-
-async def download_page(url: str):
-    req = requests.get(url)
-    html = req.content
-    soup = BeautifulSoup(html, 'html.parser')
-    images  =soup.find_all('img')
-    i = 0
-    full_images_urls = []
-    for image_tag in images:
-        print(f"try download image {i}")
-        if isinstance(image_tag, Tag):
-            image_name = image_tag.get('alt') if image_tag.get('alt') else f"Default_{i}"
-            image_url = image_tag.get('src')
-            full_images_urls.append(url + image_url)
-            with open('images/' + image_name, 'wb') as file:
-                response = requests.get(url + image_url, stream=True)
-                if response.status_code == 200:
-                    for chunk in response.iter_content(1024):
-                        file.write(chunk)
-        i+=1
-
-    return req.text
-
-
-
-async def fetch_all(urls: list):
-    tasks = [download_image(url) for url in urls]
-    results = await asyncio.gather(*tasks, return_exceptions=True) #????
-    return results
+async def fetch_all(session, urls: list):
+    tasks = [download_image(session, url) for url in urls]
+    return await asyncio.gather(*tasks, return_exceptions=True)
 
 
 async def main():
     main_url = "https://go2.utorr.cc/"
-    urls = await prepare_images_urls(main_url)
-    results = await fetch_all(urls)
+
+    # Ensure 'images' folder exists
+    os.makedirs("images", exist_ok=True)
+
+    async with aiohttp.ClientSession() as session:
+        urls = await prepare_images_urls(session, main_url)
+        await fetch_all(session, urls)
 
 asyncio.run(main())
-
-
-
-
-
-
