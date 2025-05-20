@@ -1,4 +1,5 @@
-2025-03-29 15:59:26,338 - INFO - access security page!
-2025-03-29 16:01:19,677 - INFO - access not existing page
-2025-03-29 16:03:26,327 - INFO - access not existing page. /customer/login1
-2025-03-29 16:08:23,970 - INFO - ERROR 500. Internal server error
+2025-03-29 15:59:26,338 - INFO - access from ip: 172.167.1.2 security page!
+2025-03-29 15:59:26,338 - INFO - access from ip: 172.167.44.2 security page!
+2025-03-29 15:59:26,338 - INFO - access from ip: 172.168.1.2 security page!
+2025-03-29 15:59:26,338 - INFO - access from ip: 172.167.5.2 security page!
+2025-03-29 15:59:26,338 - INFO - access from ip: 172.167.10.2 security page!
