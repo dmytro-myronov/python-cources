@@ -6,13 +6,13 @@ products = db['products']
 orders = db['orders']
 
 
-# 3. UPDATE - оновити кількість продукту після покупки
+
 products.update_one(
     {"name": "Телефон"},
     {"$inc": {"stock": -2}}
 )
 
-# 4. DELETE - видалити продукти, яких немає в наявності
+
 products.delete_many({"stock": {"$lte": 0}})
 thirty_days_ago = datetime.now() - timedelta(days=30)
 # 5. Агрегація - загальна кількість проданих продуктів за період
