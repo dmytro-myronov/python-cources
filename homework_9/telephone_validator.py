@@ -1,7 +1,6 @@
 import re
 
 
-
 r = re.match(r'\(\d{3}\) \d{3}-\d{4}',"(123) 456-7890")
 print(bool(r))
 
