@@ -1,5 +1,16 @@
 import concurrent.futures
+
 from typing import List, Tuple
+import os
+
+
+def check_file_exists(filename: str) -> bool:
+    """
+    перевiрка чи iснуе файл
+    @param filename: 
+    @return: 
+    """
+    return os.path.exists(filename)
 
 def search_in_file(filename: str, search_text: str) -> Tuple[str, List[Tuple[int, str]]]:
     """
@@ -22,8 +33,8 @@ def search_in_file(filename: str, search_text: str) -> Tuple[str, List[Tuple[int
                     found_lines.append((lineno, line.strip()))
         return filename, found_lines
 
-    except FileNotFoundError as e:
-        print(e)
+    except FileNotFoundError:
+        return filename, []
 
 
 def main(files: List[str], search_text: str) -> None:
@@ -45,7 +56,12 @@ def main(files: List[str], search_text: str) -> None:
             else:
                 print("  Текст не знайдено.")
 
+
 if __name__ == "__main__":
-    files = ["file1.txt", "file2.txt"]
+    files = ["file1.txt", "file2.txt", "file3.txt", "file4.txt"]
+    filter_files = list(filter(check_file_exists, files))
+    not_exist_files = list(set(files) - set(filter_files))
+    if len(not_exist_files) > 0:
+        print(f"this files are not exist: {not_exist_files}")
     search_text = input("текст для пошуку: ")
-    main(files, search_text)
+    main(filter_files, search_text)

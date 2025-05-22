@@ -1,8 +1,6 @@
 import math
 import threading
-from typing import List, Tuple
-
-
+from typing import List
 
 
 def split_list(l_data: list, num: int) -> list[int]:
@@ -16,15 +14,14 @@ def split_list(l_data: list, num: int) -> list[int]:
     s = math.ceil(length / num)
     new_list = []
     for i in range(s):
-        ii = i + 1
-        new_list.append(l_data[num * i:num * ii])
+        to_el = i + 1
+        new_list.append(l_data[num * i:num * to_el])
     return new_list
 
 
+list_info = [2, 4, 7, 8, 9, 1, 12, 78, 44, 22]
 
-l = [2,4,7,8,9,1,12,78,44,22]
-
-new_list = split_list(l,3)
+new_list = split_list(list_info, 3)
 
 results = [0] * len(new_list)
 def sum_(list_data, index):
@@ -39,7 +36,6 @@ for i, l_ in enumerate(new_list):
 
 for t in threads:
     t.join()
-
 
 
 print("Суммы по частям:", results)

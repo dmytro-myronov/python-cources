@@ -23,6 +23,7 @@ def process_image(image_path: str, output_folder: str = "output", size: tuple = 
     except Exception as e:
         print(f"[✗] Помилка обробки {image_path}: {e}")
 
+
 def process_images_concurrently(image_paths: List[str]) -> None:
     """
     Обробляє список зображень паралельно за допомогою потоків.
@@ -33,6 +34,7 @@ def process_images_concurrently(image_paths: List[str]) -> None:
     with ThreadPoolExecutor() as executor:
         for path in image_paths:
             executor.submit(process_image, path)
+
 
 if __name__ == "__main__":
     # 🔻 Приклад вхідних зображень (замініть на ваші шляхи)
