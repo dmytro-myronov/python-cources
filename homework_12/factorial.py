@@ -2,6 +2,7 @@ from multiprocessing import Pool
 from typing import List, Tuple
 
 import sys
+
 sys.set_int_max_str_digits(10_000_000)
 
 
@@ -17,6 +18,7 @@ def partial_factorial(range_tuple: Tuple[int, int]) -> int:
     for i in range(start, end + 1):
         result *= i
     return result
+
 
 def chunk_ranges(n: int, chunks: int) -> List[Tuple[int, int]]:
     """
@@ -37,6 +39,7 @@ def chunk_ranges(n: int, chunks: int) -> List[Tuple[int, int]]:
         start = end + 1
     return ranges
 
+
 def factorial_parallel(n: int, processes: int = 4) -> int:
     """
     Обчислює факторіал числа n, розподіляючи обчислення між процесами.
@@ -52,6 +55,7 @@ def factorial_parallel(n: int, processes: int = 4) -> int:
     for r in partial_results:
         factorial_result *= r
     return factorial_result
+
 
 if __name__ == "__main__":
     number = 100000

@@ -24,8 +24,11 @@ list_info = [2, 4, 7, 8, 9, 1, 12, 78, 44, 22]
 new_list = split_list(list_info, 3)
 
 results = [0] * len(new_list)
+
+
 def sum_(list_data, index):
     results[index] = sum(list_data)
+
 
 threads: List[threading.Thread] = []
 
@@ -36,7 +39,6 @@ for i, l_ in enumerate(new_list):
 
 for t in threads:
     t.join()
-
 
 print("Суммы по частям:", results)
 print("Общая сумма:", sum(results))

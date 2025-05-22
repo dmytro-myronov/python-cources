@@ -2,6 +2,7 @@ import threading
 import requests
 from typing import List, Tuple
 
+
 def download_file(url: str, filename: str) -> None:
     """
     Завантажує файл з вказаної URL-адреси та зберігає його під заданим ім'ям.
@@ -30,13 +31,11 @@ files_to_download: List[Tuple[str, str]] = [
     ("https://go3.utorr.cc/uploads/posts/2024-02/1707878921_poster-b2b3abcd50.jpg", "file3.jpg"),
 ]
 
-
 threads: List[threading.Thread] = []
 for url, filename in files_to_download:
     t = threading.Thread(target=download_file, args=(url, filename))
     t.start()
     threads.append(t)
-
 
 for t in threads:
     t.join()

@@ -3,6 +3,7 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
 
+
 def process_image(image_path: str, output_folder: str = "output", size: tuple = (50, 50)) -> None:
     """
     Змінює розмір зображення та зберігає його в нову папку.
