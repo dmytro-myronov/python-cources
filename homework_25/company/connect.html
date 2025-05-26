@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    let socket = new WebSocket("ws://localhost:8000/ws/company/1/");
+
+    socket.onmessage = function(event) {
+        let data = JSON.parse(event.data);
+        console.log(`${data.user}: ${data.message}`);
+    };
+
+    socket.onopen = function() {
+        socket.send(JSON.stringify({message: "Привет от пользователя"}));
+    };
+</script>
+
+
+</body>
+</html>
